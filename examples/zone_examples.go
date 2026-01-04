@@ -36,12 +36,9 @@ func TestCreateZone(client *hueapi.Client) {
 		},
 	}
 
-	zoneBuilder := builders.NewCreateZoneBuilder("Test Zone", children)
-	zoneBuilder.WithArchetype("living_room")
+	newZone := builders.NewZone("Test Zone", "living_room", children)
 
-	zone := zoneBuilder.Build()
-
-	hueResp, err := client.Zones.CreateZone(&zone)
+	hueResp, err := client.Zones.CreateZone(newZone)
 	printHueActionResponse(hueResp, err, "Create zone", true)
 }
 

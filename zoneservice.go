@@ -35,4 +35,3 @@ func (s *ZoneService) DeleteZone(id string) (*models.HueActionResponse, error) {
 	urlSuffix := fmt.Sprintf("resource/zone/%s", id)
 	return doActionRequest(s.client, http.MethodDelete, urlSuffix, nil)
 }
-

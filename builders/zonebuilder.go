@@ -12,13 +12,12 @@ func NewUpdateZoneBuilder() *ZoneBuilder {
 	}
 }
 
-func NewCreateZoneBuilder(name string, children []models.ResourceIdentifier) *ZoneBuilder {
-	metadata := models.MetadataPut{Name: &name}
-	return &ZoneBuilder{
-		edit: models.ZoneEdit{
-			Children: &children,
-			Metadata: &metadata,
-		},
+// children have the direct light id and type not the owner.rid and owner.rtype
+func NewZone(name, archetype string, children []models.ResourceIdentifier) *models.ZoneEdit {
+	metadata := models.MetadataPut{Name: &name, Archetype: &archetype}
+	return &models.ZoneEdit{
+		Children: &children,
+		Metadata: &metadata,
 	}
 }
 
@@ -30,6 +29,7 @@ func (b *ZoneBuilder) WithName(name string) *ZoneBuilder {
 	return b
 }
 
+// children have the direct light id and type not the owner.rid and owner.rtype
 func (b *ZoneBuilder) WithArchetype(archetype string) *ZoneBuilder {
 	if b.edit.Metadata == nil {
 		b.edit.Metadata = &models.MetadataPut{}

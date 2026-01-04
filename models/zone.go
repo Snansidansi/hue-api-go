@@ -6,8 +6,9 @@ type ZoneEdit struct {
 }
 
 type Zone struct {
-	ID       string               `json:"id"`
-	IDV1     string               `json:"id_v1"`
+	ID   string `json:"id"`
+	IDV1 string `json:"id_v1"`
+	// children have the direct light id and type not the owner.rid and owner.rtype
 	Children []ResourceIdentifier `json:"children"`
 	Metadata struct {
 		Name      string `json:"name"`
