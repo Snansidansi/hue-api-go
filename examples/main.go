@@ -29,7 +29,8 @@ func main() {
 	client := hueapi.NewClient(bridge, apiKey, nil, true)
 
 	// TestBridge(client)
-	TestLights(client)
+	// TestLights(client)
+	TestRooms(client)
 }
 
 func printStructFormatted(data any) {
