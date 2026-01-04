@@ -36,12 +36,9 @@ func TestCreateRoom(client *hueapi.Client) {
 		},
 	}
 
-	roomBuilder := builders.NewCreateRoomBuilder("Test Room", children)
-	roomBuilder.WithArchetype("living_room")
+	newRoom := builders.NewRoom("Test Room", "living_room", children)
 
-	room := roomBuilder.Build()
-
-	hueResp, err := client.Rooms.CreateRoom(&room)
+	hueResp, err := client.Rooms.CreateRoom(newRoom)
 	printHueActionResponse(hueResp, err, "Create room", true)
 }
 

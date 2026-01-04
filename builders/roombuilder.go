@@ -12,13 +12,12 @@ func NewUpdateRoomBuilder() *RoomBuilder {
 	}
 }
 
-func NewCreateRoomBuilder(name string, children []models.ResourceIdentifier) *RoomBuilder {
-	metadata := models.MetadataPut{Name: &name}
-	return &RoomBuilder{
-		edit: models.RoomEdit{
-			Children: &children,
-			Metadata: &metadata,
-		},
+// children have the light owner.rid and owner.rtype
+func NewRoom(name, archetype string, children []models.ResourceIdentifier) *models.RoomEdit {
+	metadata := models.MetadataPut{Name: &name, Archetype: &archetype}
+	return &models.RoomEdit{
+		Children: &children,
+		Metadata: &metadata,
 	}
 }
 
@@ -38,6 +37,7 @@ func (b *RoomBuilder) WithArchetype(archetype string) *RoomBuilder {
 	return b
 }
 
+// children have the light owner.rid and owner.rtype
 func (b *RoomBuilder) WithChildren(children []models.ResourceIdentifier) *RoomBuilder {
 	b.edit.Children = &children
 	return b

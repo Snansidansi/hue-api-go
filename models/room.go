@@ -6,8 +6,9 @@ type RoomEdit struct {
 }
 
 type Room struct {
-	ID       string               `json:"id"`
-	IDV1     string               `json:"id_v1"`
+	ID   string `json:"id"`
+	IDV1 string `json:"id_v1"`
+	// children have the light owner.rid and owner.rtype
 	Children []ResourceIdentifier `json:"children"`
 	Metadata struct {
 		Name      string `json:"name"`
