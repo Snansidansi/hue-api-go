@@ -34,6 +34,7 @@ type Client struct {
 
 	Lights   *LightService
 	Rooms    *RoomService
+	Zones    *ZoneService
 	Register *RegisterService
 }
 
@@ -61,6 +62,7 @@ func NewClient(bridge models.Bridge, apiKey string, httpClient *http.Client, log
 
 	c.Lights = &LightService{client: c}
 	c.Rooms = &RoomService{client: c}
+	c.Zones = &ZoneService{client: c}
 	c.Register = &RegisterService{client: c}
 
 	return c
@@ -147,4 +149,3 @@ func doActionRequest(client *Client, method, urlSuffix string, body any) (*model
 
 	return &hueResp, nil
 }
-
