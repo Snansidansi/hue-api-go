@@ -6,9 +6,19 @@ type RoomBuilder struct {
 	edit models.RoomEdit
 }
 
-func NewRoomBuilder() *RoomBuilder {
+func NewUpdateRoomBuilder() *RoomBuilder {
 	return &RoomBuilder{
 		edit: models.RoomEdit{},
+	}
+}
+
+func NewCreateRoomBuilder(name string, children []models.ResourceIdentifier) *RoomBuilder {
+	metadata := models.MetadataPut{Name: &name}
+	return &RoomBuilder{
+		edit: models.RoomEdit{
+			Children: &children,
+			Metadata: &metadata,
+		},
 	}
 }
 

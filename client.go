@@ -1,9 +1,11 @@
 package hueapi
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/snansidansi/hueapi/models"
@@ -86,6 +88,63 @@ func DiscoverBridges(httpClient *http.Client) ([]models.Bridge, error) {
 	return foundBridges, nil
 }
 
-func (c *Client) CreateURL(specificURL string) string {
-	return fmt.Sprintf("https://%s/clip/v2/%s", c.Bridge.IPAdress, specificURL)
+func (c *Client) CreateURL(urlSuffix string) string {
+	return fmt.Sprintf("https://%s/clip/v2/%s", c.Bridge.IPAdress, urlSuffix)
 }
+
+func doGetRequest[T any](client *Client, urlSuffix string) (*models.HueResponse[T], error) {
+	url := client.CreateURL(urlSuffix)
+
+	resp, err := client.HTTPClient.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var hueResp models.HueResponse[T]
+	hueResp.StatusCode = resp.StatusCode
+
+	if err := json.NewDecoder(resp.Body).Decode(&hueResp); err != nil {
+		return &hueResp, fmt.Errorf("decoding failed (status %d): %w", resp.StatusCode, err)
+	}
+
+	return &hueResp, nil
+}
+
+func doActionRequest(client *Client, method, urlSuffix string, body any) (*models.HueActionResponse, error) {
+	url := client.CreateURL(urlSuffix)
+
+	var reqBody io.Reader
+	if body != nil {
+		jsonData, err := json.Marshal(body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal request body: %w", err)
+		}
+		reqBody = bytes.NewBuffer(jsonData)
+	}
+
+	req, err := http.NewRequest(method, url, reqBody)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+
+	resp, err := client.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var hueResp models.HueActionResponse
+	hueResp.StatusCode = resp.StatusCode
+
+	if err := json.NewDecoder(resp.Body).Decode(&hueResp); err != nil {
+		return &hueResp, fmt.Errorf("decoding failed (status %d): %w", resp.StatusCode, err)
+	}
+
+	return &hueResp, nil
+}
+

@@ -36,14 +36,12 @@ func TestCreateRoom(client *hueapi.Client) {
 		},
 	}
 
-	roomBuilder := builders.NewRoomBuilder()
+	roomBuilder := builders.NewCreateRoomBuilder("Test Room", children)
 	roomBuilder.WithArchetype("living_room")
-	roomBuilder.WithName("Test Room")
-	roomBuilder.WithChildren(children)
 
 	room := roomBuilder.Build()
 
-	hueResp, err := client.Rooms.CreateRoom(room)
+	hueResp, err := client.Rooms.CreateRoom(&room)
 	printHueActionResponse(hueResp, err, "Create room", true)
 }
 
@@ -68,11 +66,11 @@ func TestUpdateRoom(client *hueapi.Client) {
 		return
 	}
 
-	updateBuilder := builders.NewRoomBuilder()
+	updateBuilder := builders.NewUpdateRoomBuilder()
 	updateBuilder.WithName("Updated test room")
 	roomUpdate := updateBuilder.Build()
 
-	updateResp, err := client.Rooms.UpdateRoom(testRoomID, roomUpdate)
+	updateResp, err := client.Rooms.UpdateRoom(testRoomID, &roomUpdate)
 	printHueActionResponse(updateResp, err, "Update room", true)
 }
 

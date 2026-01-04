@@ -1,8 +1,6 @@
 package hueapi
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -14,123 +12,26 @@ type RoomService struct {
 }
 
 func (s *RoomService) GetAllRooms() (*models.HueResponse[models.Room], error) {
-	url := s.client.CreateURL("resource/room")
-
-	resp, err := s.client.HTTPClient.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var hueResp models.HueResponse[models.Room]
-	hueResp.StatusCode = resp.StatusCode
-
-	if err := json.NewDecoder(resp.Body).Decode(&hueResp); err != nil {
-		return &hueResp, fmt.Errorf("decoding failed (status %d): %w", resp.StatusCode, err)
-	}
-
-	return &hueResp, nil
+	urlSuffix := "resource/room"
+	return doGetRequest[models.Room](s.client, urlSuffix)
 }
 
 func (s *RoomService) GetRoomByID(id string) (*models.HueResponse[models.Room], error) {
-	url := s.client.CreateURL("resource/room/" + id)
-
-	resp, err := s.client.HTTPClient.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var hueResp models.HueResponse[models.Room]
-	hueResp.StatusCode = resp.StatusCode
-
-	if err := json.NewDecoder(resp.Body).Decode(&hueResp); err != nil {
-		return &hueResp, fmt.Errorf("decoding failed (status %d): %w", resp.StatusCode, err)
-	}
-
-	return &hueResp, nil
+	urlSuffix := fmt.Sprintf("resource/room/%s", id)
+	return doGetRequest[models.Room](s.client, urlSuffix)
 }
 
-func (s *RoomService) UpdateRoom(id string, roomUpdate models.RoomEdit) (*models.HueActionResponse, error) {
-	url := s.client.CreateURL("resource/room/" + id)
-
-	jsonData, err := json.Marshal(roomUpdate)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonData))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := s.client.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var hueResp models.HueActionResponse
-	hueResp.StatusCode = resp.StatusCode
-
-	if err := json.NewDecoder(resp.Body).Decode(&hueResp); err != nil {
-		return &hueResp, fmt.Errorf("decoding failed (status %d): %w", resp.StatusCode, err)
-	}
-
-	return &hueResp, nil
+func (s *RoomService) UpdateRoom(id string, roomUpdate *models.RoomEdit) (*models.HueActionResponse, error) {
+	urlSuffix := fmt.Sprintf("resource/room/%s", id)
+	return doActionRequest(s.client, http.MethodPut, urlSuffix, roomUpdate)
 }
 
-func (s *RoomService) CreateRoom(room models.RoomEdit) (*models.HueActionResponse, error) {
-	url := s.client.CreateURL("resource/room")
-
-	jsonData, err := json.Marshal(room)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := s.client.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var hueResp models.HueActionResponse
-	hueResp.StatusCode = resp.StatusCode
-
-	if err := json.NewDecoder(resp.Body).Decode(&hueResp); err != nil {
-		return &hueResp, fmt.Errorf("decoding failed (status %d): %w", resp.StatusCode, err)
-	}
-
-	return &hueResp, nil
+func (s *RoomService) CreateRoom(room *models.RoomEdit) (*models.HueActionResponse, error) {
+	urlSuffix := "resource/room"
+	return doActionRequest(s.client, http.MethodPost, urlSuffix, room)
 }
 
 func (s *RoomService) DeleteRoom(id string) (*models.HueActionResponse, error) {
-	url := s.client.CreateURL("resource/room/" + id)
-
-	req, err := http.NewRequest("DELETE", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := s.client.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var hueResp models.HueActionResponse
-	hueResp.StatusCode = resp.StatusCode
-
-	if err := json.NewDecoder(resp.Body).Decode(&hueResp); err != nil {
-		return &hueResp, fmt.Errorf("decoding failed (status %d): %w", resp.StatusCode, err)
-	}
-
-	return &hueResp, nil
+	urlSuffix := fmt.Sprintf("resource/room/%s", id)
+	return doActionRequest(s.client, http.MethodDelete, urlSuffix, nil)
 }

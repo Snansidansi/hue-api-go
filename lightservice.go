@@ -1,8 +1,6 @@
 package hueapi
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -15,71 +13,18 @@ type LightService struct {
 }
 
 func (l *LightService) GetAllLights() (*models.HueResponse[models.Light], error) {
-	url := l.client.CreateURL("resource/light")
-
-	resp, err := l.client.HTTPClient.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var hueResp models.HueResponse[models.Light]
-	hueResp.StatusCode = resp.StatusCode
-
-	if err := json.NewDecoder(resp.Body).Decode(&hueResp); err != nil {
-		return &hueResp, fmt.Errorf("decoding failed (status %d): %w", resp.StatusCode, err)
-	}
-
-	return &hueResp, nil
+	urlSuffix := "resource/light"
+	return doGetRequest[models.Light](l.client, urlSuffix)
 }
 
 func (l *LightService) GetLightByID(id string) (*models.HueResponse[models.Light], error) {
-	url := l.client.CreateURL("resource/light/" + id)
-
-	resp, err := l.client.HTTPClient.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var hueResp models.HueResponse[models.Light]
-	hueResp.StatusCode = resp.StatusCode
-
-	if err := json.NewDecoder(resp.Body).Decode(&hueResp); err != nil {
-		return &hueResp, fmt.Errorf("decoding failed (status %d): %w", resp.StatusCode, err)
-	}
-
-	return &hueResp, nil
+	urlSuffix := fmt.Sprintf("resource/light/%s", id)
+	return doGetRequest[models.Light](l.client, urlSuffix)
 }
 
-func (s *LightService) SetLightState(id string, update models.LightPut) (*models.HueActionResponse, error) {
-	url := s.client.CreateURL("resource/light/" + id)
-
-	jsonData, err := json.Marshal(update)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonData))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := s.client.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var hueResp models.HueActionResponse
-	hueResp.StatusCode = resp.StatusCode
-
-	if err := json.NewDecoder(resp.Body).Decode(&hueResp); err != nil {
-		return &hueResp, fmt.Errorf("response decode failed (status %d): %w", resp.StatusCode, err)
-	}
-
-	return &hueResp, nil
+func (s *LightService) SetLightState(id string, update *models.LightPut) (*models.HueActionResponse, error) {
+	urlSuffix := fmt.Sprintf("resource/light/%s", id)
+	return doActionRequest(s.client, http.MethodPut, urlSuffix, update)
 }
 
 func (s *LightService) On(id string) (*models.HueActionResponse, error) {
@@ -96,7 +41,7 @@ func (s *LightService) SetOnOff(id string, on bool) (*models.HueActionResponse, 
 			On: &on,
 		},
 	}
-	return s.SetLightState(id, update)
+	return s.SetLightState(id, &update)
 }
 
 func (s *LightService) Rename(id string, name string) (*models.HueActionResponse, error) {
@@ -105,7 +50,7 @@ func (s *LightService) Rename(id string, name string) (*models.HueActionResponse
 			Name: &name,
 		},
 	}
-	return s.SetLightState(id, update)
+	return s.SetLightState(id, &update)
 }
 
 func (s *LightService) SetBrightness(id string, brightness float64) (*models.HueActionResponse, error) {
@@ -114,7 +59,7 @@ func (s *LightService) SetBrightness(id string, brightness float64) (*models.Hue
 			Brightness: &brightness,
 		},
 	}
-	return s.SetLightState(id, update)
+	return s.SetLightState(id, &update)
 }
 
 func (s *LightService) SetColor(id string, r, g, b int) (*models.HueActionResponse, error) {
@@ -131,7 +76,7 @@ func (s *LightService) SetColorXY(id string, x, y float64) (*models.HueActionRes
 			},
 		},
 	}
-	return s.SetLightState(id, update)
+	return s.SetLightState(id, &update)
 }
 
 func (s *LightService) SetTemperature(id string, mirek int) (*models.HueActionResponse, error) {
@@ -140,7 +85,7 @@ func (s *LightService) SetTemperature(id string, mirek int) (*models.HueActionRe
 			Mirek: &mirek,
 		},
 	}
-	return s.SetLightState(id, update)
+	return s.SetLightState(id, &update)
 }
 
 func (s *LightService) Identify(id string, durationMs int64) (*models.HueActionResponse, error) {
@@ -151,5 +96,5 @@ func (s *LightService) Identify(id string, durationMs int64) (*models.HueActionR
 			Duration: &durationMs,
 		},
 	}
-	return s.SetLightState(id, update)
+	return s.SetLightState(id, &update)
 }
