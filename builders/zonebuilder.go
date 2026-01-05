@@ -6,6 +6,7 @@ type ZoneBuilder struct {
 	edit models.ZoneEdit
 }
 
+// To create a new zone use the NewZone function.
 func NewUpdateZoneBuilder() *ZoneBuilder {
 	return &ZoneBuilder{
 		edit: models.ZoneEdit{},
