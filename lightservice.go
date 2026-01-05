@@ -22,7 +22,7 @@ func (l *LightService) GetLightByID(id string) (*models.HueResponse[models.Light
 	return doGetRequest[models.Light](l.client, urlSuffix)
 }
 
-func (s *LightService) SetLightState(id string, update *models.LightPut) (*models.HueActionResponse, error) {
+func (s *LightService) SetLightState(id string, update *models.LightUpdate) (*models.HueActionResponse, error) {
 	urlSuffix := fmt.Sprintf("resource/light/%s", id)
 	return doActionRequest(s.client, http.MethodPut, urlSuffix, update)
 }
@@ -36,8 +36,8 @@ func (s *LightService) Off(id string) (*models.HueActionResponse, error) {
 }
 
 func (s *LightService) SetOnOff(id string, on bool) (*models.HueActionResponse, error) {
-	update := models.LightPut{
-		On: &models.OnPut{
+	update := models.LightUpdate{
+		On: &models.On{
 			On: &on,
 		},
 	}
@@ -45,8 +45,8 @@ func (s *LightService) SetOnOff(id string, on bool) (*models.HueActionResponse, 
 }
 
 func (s *LightService) Rename(id string, name string) (*models.HueActionResponse, error) {
-	update := models.LightPut{
-		Metadata: &models.MetadataPut{
+	update := models.LightUpdate{
+		Metadata: &models.Metadata{
 			Name: &name,
 		},
 	}
@@ -54,8 +54,8 @@ func (s *LightService) Rename(id string, name string) (*models.HueActionResponse
 }
 
 func (s *LightService) SetBrightness(id string, brightness float64) (*models.HueActionResponse, error) {
-	update := models.LightPut{
-		Dimming: &models.DimmingPut{
+	update := models.LightUpdate{
+		Dimming: &models.Dimming{
 			Brightness: &brightness,
 		},
 	}
@@ -68,11 +68,11 @@ func (s *LightService) SetColor(id string, r, g, b int) (*models.HueActionRespon
 }
 
 func (s *LightService) SetColorXY(id string, x, y float64) (*models.HueActionResponse, error) {
-	update := models.LightPut{
-		Color: &models.ColorPut{
-			XY: &models.XYPut{
-				X: &x,
-				Y: &y,
+	update := models.LightUpdate{
+		Color: &models.Color{
+			XY: &models.XY{
+				X: x,
+				Y: y,
 			},
 		},
 	}
@@ -80,8 +80,8 @@ func (s *LightService) SetColorXY(id string, x, y float64) (*models.HueActionRes
 }
 
 func (s *LightService) SetTemperature(id string, mirek int) (*models.HueActionResponse, error) {
-	update := models.LightPut{
-		ColorTemperature: &models.ColorTemperaturePut{
+	update := models.LightUpdate{
+		ColorTemperature: &models.ColorTemperature{
 			Mirek: &mirek,
 		},
 	}
@@ -90,8 +90,8 @@ func (s *LightService) SetTemperature(id string, mirek int) (*models.HueActionRe
 
 func (s *LightService) Identify(id string, durationMs int64) (*models.HueActionResponse, error) {
 	action := "identify"
-	update := models.LightPut{
-		Identify: &models.IdentifyPut{
+	update := models.LightUpdate{
+		Identify: &models.Identify{
 			Action:   &action,
 			Duration: &durationMs,
 		},
