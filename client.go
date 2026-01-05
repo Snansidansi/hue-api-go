@@ -22,7 +22,7 @@ func (t *headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	newReq.Header.Add("hue-application-key", t.apiKey)
 
 	if t.logging {
-		fmt.Printf("[HUE] %s %s\n", newReq.Method, newReq.URL.String())
+		fmt.Printf("\n[HUE] %s %s", newReq.Method, newReq.URL.String())
 	}
 
 	return t.base.RoundTrip(newReq)
@@ -35,6 +35,7 @@ type Client struct {
 	Lights   *LightService
 	Rooms    *RoomService
 	Zones    *ZoneService
+	Scenes   *SceneService
 	Register *RegisterService
 }
 
@@ -63,6 +64,7 @@ func NewClient(bridge models.Bridge, apiKey string, httpClient *http.Client, log
 	c.Lights = &LightService{client: c}
 	c.Rooms = &RoomService{client: c}
 	c.Zones = &ZoneService{client: c}
+	c.Scenes = &SceneService{client: c}
 	c.Register = &RegisterService{client: c}
 
 	return c
