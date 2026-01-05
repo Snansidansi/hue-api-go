@@ -36,7 +36,8 @@ func main() {
 	// TestDevicePower(client)
 	// TestDeviceSoftwareUpdate(client)
 	// TestEntertainmentConfiguration(client)
-	TestEntertainment(client)
+	// TestEntertainment(client)
+	TestBridgeHome(client)
 }
 
 func printStructFormatted(data any) {

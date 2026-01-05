@@ -41,6 +41,7 @@ type Client struct {
 	DeviceSoftwareUpdate       *DeviceSoftwareUpdateService
 	EntertainmentConfiguration *EntertainmentConfigurationService
 	Entertainment              *EntertainmentService
+	BridgeHome                 *BridgeHomeService
 }
 
 // Uses http.DefaultCLient when httpClient is nil.
@@ -74,6 +75,7 @@ func NewClient(bridge models.Bridge, apiKey string, httpClient *http.Client, log
 	c.DeviceSoftwareUpdate = &DeviceSoftwareUpdateService{client: c}
 	c.EntertainmentConfiguration = &EntertainmentConfigurationService{client: c}
 	c.Entertainment = &EntertainmentService{client: c}
+	c.BridgeHome = &BridgeHomeService{client: c}
 
 	return c
 }
