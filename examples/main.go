@@ -31,7 +31,8 @@ func main() {
 	// TestBridge(client)
 	// TestLights(client)
 	// TestRooms(client)
-	TestZones(client)
+	// TestZones(client)
+	TestScenes(client)
 }
 
 func printStructFormatted(data any) {
