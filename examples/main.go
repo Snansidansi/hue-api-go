@@ -32,7 +32,8 @@ func main() {
 	// TestLights(client)
 	// TestRooms(client)
 	// TestZones(client)
-	TestScenes(client)
+	// TestScenes(client)
+	TestDevicePower(client)
 }
 
 func printStructFormatted(data any) {
