@@ -1,8 +1,8 @@
 package builders
 
 import (
-	"github.com/snansidansi/hueapi/models"
-	"github.com/snansidansi/hueapi/util"
+	"github.com/Snansidansi/hue-api-go/models"
+	"github.com/Snansidansi/hue-api-go/util"
 )
 
 type GroupedLightBuilder struct {

@@ -1,4 +1,4 @@
-module github.com/snansidansi/hueapi
+module github.com/Snansidansi/hue-api-go
 
 go 1.23.2
 

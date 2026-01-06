@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/snansidansi/hueapi/models"
+	"github.com/Snansidansi/hue-api-go/models"
 )
 
 type RegisterService struct {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/snansidansi/hueapi"
+	"github.com/Snansidansi/hue-api-go"
 )
 
 func TestDeviceSoftwareUpdate(client *hueapi.Client) {

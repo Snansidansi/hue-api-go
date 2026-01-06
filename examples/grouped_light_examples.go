@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/snansidansi/hueapi"
-	"github.com/snansidansi/hueapi/builders"
+	"github.com/Snansidansi/hue-api-go"
+	"github.com/Snansidansi/hue-api-go/builders"
 )
 
 func TestGroupedLight(client *hueapi.Client) {

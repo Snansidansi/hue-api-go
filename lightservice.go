@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/snansidansi/hueapi/models"
-	"github.com/snansidansi/hueapi/util"
+	"github.com/Snansidansi/hue-api-go/models"
+	"github.com/Snansidansi/hue-api-go/util"
 )
 
 type LightService struct {

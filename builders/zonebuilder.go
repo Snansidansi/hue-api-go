@@ -1,6 +1,6 @@
 package builders
 
-import "github.com/snansidansi/hueapi/models"
+import "github.com/Snansidansi/hue-api-go/models"
 
 type ZoneBuilder struct {
 	edit models.ZoneEdit

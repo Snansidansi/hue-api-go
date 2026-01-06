@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Snansidansi/hue-api-go"
+	"github.com/Snansidansi/hue-api-go/models"
 	"github.com/joho/godotenv"
-	"github.com/snansidansi/hueapi"
-	"github.com/snansidansi/hueapi/models"
 )
 
 func main() {

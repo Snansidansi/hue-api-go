@@ -3,7 +3,7 @@ package hueapi
 import (
 	"fmt"
 
-	"github.com/snansidansi/hueapi/models"
+	"github.com/Snansidansi/hue-api-go/models"
 )
 
 type DeviceSoftwareUpdateService struct {

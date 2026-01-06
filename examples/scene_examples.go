@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/snansidansi/hueapi"
-	"github.com/snansidansi/hueapi/builders"
-	"github.com/snansidansi/hueapi/models"
+	"github.com/Snansidansi/hue-api-go"
+	"github.com/Snansidansi/hue-api-go/builders"
+	"github.com/Snansidansi/hue-api-go/models"
 )
 
 func TestScenes(client *hueapi.Client) {

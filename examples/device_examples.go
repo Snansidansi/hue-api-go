@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/snansidansi/hueapi"
-	"github.com/snansidansi/hueapi/builders"
-	"github.com/snansidansi/hueapi/models"
+	"github.com/Snansidansi/hue-api-go"
+	"github.com/Snansidansi/hue-api-go/builders"
+	"github.com/Snansidansi/hue-api-go/models"
 )
 
 func TestDevice(client *hueapi.Client) {

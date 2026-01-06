@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/snansidansi/hueapi"
-	"github.com/snansidansi/hueapi/models"
+	"github.com/Snansidansi/hue-api-go"
+	"github.com/Snansidansi/hue-api-go/models"
 )
 
 func TestBridge(client *hueapi.Client) {

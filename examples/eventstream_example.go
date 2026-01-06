@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/snansidansi/hueapi"
-	"github.com/snansidansi/hueapi/models"
-	"github.com/snansidansi/hueapi/util"
+	"github.com/Snansidansi/hue-api-go"
+	"github.com/Snansidansi/hue-api-go/models"
+	"github.com/Snansidansi/hue-api-go/util"
 )
 
 func TestEventStream(client *hueapi.Client) {

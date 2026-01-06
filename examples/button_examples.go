@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/snansidansi/hueapi"
+	"github.com/Snansidansi/hue-api-go"
 )
 
 func TestButtons(client *hueapi.Client) {

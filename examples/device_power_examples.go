@@ -1,6 +1,6 @@
 package main
 
-import "github.com/snansidansi/hueapi"
+import "github.com/Snansidansi/hue-api-go"
 
 func TestDevicePower(client *hueapi.Client) {
 	TestGetAllDevicePower(client)

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/snansidansi/hueapi"
+	"github.com/Snansidansi/hue-api-go"
 )
 
 func TestEntertainmentConfiguration(client *hueapi.Client) {

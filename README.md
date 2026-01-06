@@ -9,8 +9,8 @@ For a complete overview of all features, please have a look at the `examples` di
 To use the API, you first need to create a client:
 
 ```go
-import "github.com/snansidansi/hueapi"
-import "github.com/snansidansi/hueapi/models"
+import "github.com/Snansidansi/hue-api-go"
+import "github.com/Snansidansi/hue-api-go/models"
 
 // ...
 
