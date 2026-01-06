@@ -40,7 +40,8 @@ func main() {
 	// TestBridgeHome(client)
 	// TestDevice(client)
 	// TestGroupedLight(client)
-	TestEventStream(client)
+	// TestEventStream(client)
+	TestButtons(client)
 }
 
 func printStructFormatted(data any) {
