@@ -54,7 +54,6 @@ func (es *EventService) GetErrorStream(chanBufSize uint) <-chan error {
 	return es.errorChan
 }
 
-// Get the raw/eventstream before running Start() or the events till you get the channels are lost
 func (es *EventService) Start() {
 	go es.listenLoop()
 }
@@ -82,11 +81,9 @@ func (es *EventService) listenLoop() {
 			if es.ctx.Err() != nil {
 				return
 			}
-
 			if es.errorChan != nil {
 				es.errorChan <- fmt.Errorf("Eventstream connect error. Retrying in 2s. Error: %w", err)
 			}
-
 			select {
 			case <-time.After(2 * time.Second):
 				continue
@@ -98,21 +95,13 @@ func (es *EventService) listenLoop() {
 		scanner := bufio.NewScanner(resp.Body)
 		for scanner.Scan() {
 			line := scanner.Text()
-
-			// Hue Bridge sends data in this format: "data: [...]"
 			if after, ok := strings.CutPrefix(line, "data: "); ok {
-				payload := after
-				jsonBytes := []byte(payload)
-
-				es.dispatch(jsonBytes)
+				es.dispatch([]byte(after))
 			}
 		}
 
 		resp.Body.Close()
-
-		// Bridge closed the connection or Scanner closed
 		if es.ctx.Err() == nil {
-			// Add a brief delay to prevent overwhelming the bridge
 			time.Sleep(1 * time.Second)
 		}
 	}
@@ -132,61 +121,65 @@ func (es *EventService) dispatch(data []byte) {
 }
 
 type streamMessage struct {
-	Type string       `json:"type"` // "update", "add"
-	Data []streamData `json:"data"`
+	Type         string       `json:"type"` // "update", "add", "delete"
+	CreationTime time.Time    `json:"creationtime"`
+	Data         []streamData `json:"data"`
 }
 
 type streamData struct {
-	ID      string          `json:"id"`
-	Type    string          `json:"type"` // "light", "grouped_light", "button"
-	On      *models.On      `json:"on,omitempty"`
-	Dimming *models.Dimming `json:"dimming,omitempty"`
-	Color   *models.Color   `json:"color,omitempty"`
-	Button  *struct {
+	ID   string `json:"id"`
+	Type string `json:"type"`
+
+	On               *models.On               `json:"on,omitempty"`
+	Dimming          *models.Dimming          `json:"dimming,omitempty"`
+	Color            *models.Color            `json:"color,omitempty"`
+	ColorTemperature *models.ColorTemperature `json:"color_temperature,omitempty"`
+	Dynamics         *models.Dynamics         `json:"dynamics,omitempty"`
+
+	Status json.RawMessage `json:"status,omitempty"`
+
+	ActiveStreamer *models.ResourceIdentifier `json:"active_streamer,omitempty"`
+
+	Button *struct {
 		LastEvent string `json:"last_event"`
 	} `json:"button,omitempty"`
+
+	Metadata *struct {
+		Name      string `json:"name"`
+		Archetype string `json:"archetype"`
+	} `json:"metadata,omitempty"`
+
+	Owner    *models.ResourceIdentifier  `json:"owner,omitempty"`
+	Children []models.ResourceIdentifier `json:"children,omitempty"`
+	Group    *models.ResourceIdentifier  `json:"group,omitempty"`
+	Actions  []models.SceneAction        `json:"actions,omitempty"`
+	Speed    *float64                    `json:"speed,omitempty"`
 }
 
-// Can return the following events: LightChangeEvent, GroupChangeEvent, ButtonEvent
 func (es *EventService) processStructured(data []byte) {
 	var msgs []streamMessage
 	if err := json.Unmarshal(data, &msgs); err != nil {
 		if es.errorChan != nil {
 			es.errorChan <- fmt.Errorf("Error while processing structured data: %w", err)
 		}
+		return
 	}
 
 	for _, msg := range msgs {
-		if msg.Type != "update" && msg.Type != "add" {
-			continue
-		}
+		eventType := msg.Type
+		timestamp := msg.CreationTime
 
 		for _, item := range msg.Data {
-			var event any
+			stateChanges := es.determineStateChange(eventType, item)
 
-			switch item.Type {
-			case "light":
-				event = models.LightChangeEvent{
-					ID:      item.ID,
-					On:      item.On,
-					Dimming: item.Dimming,
-					Color:   item.Color,
-				}
-			case "grouped_light", "zone", "room":
-				event = models.GroupChangeEvent{
-					ID:      item.ID,
-					On:      item.On,
-					Dimming: item.Dimming,
-					Type:    item.Type,
-				}
-			case "button":
-				if item.Button != nil {
-					event = models.ButtonEvent{
-						ID:        item.ID,
-						EventType: item.Button.LastEvent,
-					}
-				}
+			base := models.BaseEventFields{
+				EventType:    eventType,
+				ID:           item.ID,
+				Timestamp:    timestamp,
+				StateChanges: stateChanges,
 			}
+
+			event := es.createEventModel(base, item)
 
 			if event != nil {
 				select {
@@ -196,4 +189,132 @@ func (es *EventService) processStructured(data []byte) {
 			}
 		}
 	}
+}
+
+func (es *EventService) determineStateChange(eventType string, item streamData) bool {
+	hasState := false
+	hasConfig := false
+
+	switch item.Type {
+	case "light":
+		if item.On != nil || item.Dimming != nil || item.Color != nil || item.ColorTemperature != nil || item.Dynamics != nil {
+			hasState = true
+		}
+
+		if item.Metadata != nil {
+			hasConfig = true
+		}
+
+	case "grouped_light":
+		if item.On != nil || item.Dimming != nil {
+			hasState = true
+		}
+		// The Hue API sends 'owner' with state updates (context), so it's not a config change.
+		if item.Metadata != nil {
+			hasConfig = true
+		}
+
+	case "zone", "room":
+		if item.On != nil || item.Dimming != nil {
+			hasState = true
+		}
+
+		// If children change or name changes
+		if item.Metadata != nil || len(item.Children) > 0 {
+			hasConfig = true
+		}
+
+	case "button":
+		if item.Button != nil {
+			hasState = true
+		}
+
+	case "scene":
+		if len(item.Status) > 0 && string(item.Status) != "null" {
+			hasState = true
+		}
+
+		if item.Metadata != nil || item.Group != nil || len(item.Actions) > 0 || item.Speed != nil {
+			hasConfig = true
+		}
+
+	case "entertainment_configuration":
+		if len(item.Status) > 0 && string(item.Status) != "null" {
+			hasState = true
+		}
+
+		if item.ActiveStreamer != nil {
+			hasState = true
+		}
+		if item.Metadata != nil {
+			hasConfig = true
+		}
+	}
+
+	if eventType == models.EventTypeUpdate && hasState && !hasConfig {
+		return true
+	}
+
+	return false
+}
+
+func (es *EventService) createEventModel(base models.BaseEventFields, item streamData) any {
+	switch item.Type {
+	case "light":
+		return models.LightChangeEvent{
+			BaseEventFields:  base,
+			On:               item.On,
+			Dimming:          item.Dimming,
+			Color:            item.Color,
+			ColorTemperature: item.ColorTemperature,
+			Dynamics:         item.Dynamics,
+		}
+
+	case "grouped_light", "zone", "room":
+		return models.GroupChangeEvent{
+			BaseEventFields: base,
+			Type:            item.Type,
+			On:              item.On,
+			Dimming:         item.Dimming,
+		}
+
+	case "button":
+		btnAction := ""
+		if item.Button != nil {
+			btnAction = item.Button.LastEvent
+		}
+		return models.ButtonEvent{
+			BaseEventFields: base,
+			Button:          btnAction,
+		}
+
+	case "scene":
+		var sceneStatus *models.SceneStatusEvent
+		if len(item.Status) > 0 && string(item.Status) != "null" {
+			err := json.Unmarshal(item.Status, &sceneStatus)
+			if err != nil && es.errorChan != nil {
+				es.errorChan <- err
+			}
+		}
+		return models.SceneEvent{
+			BaseEventFields: base,
+			Status:          sceneStatus,
+		}
+
+	case "entertainment_configuration":
+		var statusString string
+		if len(item.Status) > 0 && string(item.Status) != "null" {
+			err := json.Unmarshal(item.Status, &statusString)
+			if err != nil && es.errorChan != nil {
+				es.errorChan <- err
+			}
+		}
+		return models.EntertainmentConfigurationEvent{
+			BaseEventFields: base,
+			Status:          statusString,
+			ActiveStreamer:  item.ActiveStreamer,
+		}
+	}
+
+	return nil
 }
