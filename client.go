@@ -22,7 +22,7 @@ func (t *headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	newReq.Header.Add("hue-application-key", t.apiKey)
 
 	if t.logging {
-		fmt.Printf("\n[HUE] %s %s", newReq.Method, newReq.URL.String())
+		fmt.Printf("\n[HUE] %s %s\n", newReq.Method, newReq.URL.String())
 	}
 
 	return t.base.RoundTrip(newReq)
