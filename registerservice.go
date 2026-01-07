@@ -10,7 +10,7 @@ import (
 	"github.com/Snansidansi/hue-api-go/models"
 )
 
-type RegisterService struct {
+type registerService struct {
 	client *Client
 }
 

@@ -7,21 +7,21 @@ import (
 	"github.com/Snansidansi/hue-api-go/models"
 )
 
-type GroupedLightService struct {
+type groupedLightService struct {
 	client *Client
 }
 
-func (s *GroupedLightService) GetAllGroupedLights() (*models.HueResponse[models.GroupedLight], error) {
+func (s *groupedLightService) GetAllGroupedLights() (*models.HueResponse[models.GroupedLight], error) {
 	urlSuffix := "resource/grouped_light"
 	return doGetRequest[models.GroupedLight](s.client, urlSuffix)
 }
 
-func (s *GroupedLightService) GetGroupedLightByID(id string) (*models.HueResponse[models.GroupedLight], error) {
+func (s *groupedLightService) GetGroupedLightByID(id string) (*models.HueResponse[models.GroupedLight], error) {
 	urlSuffix := fmt.Sprintf("resource/grouped_light/%s", id)
 	return doGetRequest[models.GroupedLight](s.client, urlSuffix)
 }
 
-func (s *GroupedLightService) UpdateGroupedLight(id string, update models.GroupedLightUpdate) (*models.HueActionResponse, error) {
+func (s *groupedLightService) UpdateGroupedLight(id string, update models.GroupedLightUpdate) (*models.HueActionResponse, error) {
 	urlSuffix := fmt.Sprintf("resource/grouped_light/%s", id)
 	return doActionRequest(s.client, http.MethodPut, urlSuffix, &update)
 }

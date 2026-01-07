@@ -32,20 +32,20 @@ type Client struct {
 	Bridge     models.Bridge
 	HTTPClient *http.Client
 
-	Lights                     *LightService
-	Rooms                      *RoomService
-	Zones                      *ZoneService
-	Scenes                     *SceneService
-	Register                   *RegisterService
-	DevicePower                *DevicePowerService
-	DeviceSoftwareUpdate       *DeviceSoftwareUpdateService
-	EntertainmentConfiguration *EntertainmentConfigurationService
-	Entertainment              *EntertainmentService
-	BridgeHome                 *BridgeHomeService
-	Device                     *DeviceService
-	GroupedLight               *GroupedLightService
-	EventStream                *EventService
-	Button                     *ButtonService
+	Lights                     *lightService
+	Rooms                      *roomService
+	Zones                      *zoneService
+	Scenes                     *sceneService
+	Register                   *registerService
+	DevicePower                *devicePowerService
+	DeviceSoftwareUpdate       *deviceSoftwareUpdateService
+	EntertainmentConfiguration *entertainmentConfigurationService
+	Entertainment              *entertainmentService
+	BridgeHome                 *bridgeHomeService
+	Device                     *deviceService
+	GroupedLight               *groupedLightService
+	EventStream                *eventService
+	Button                     *buttonService
 }
 
 // Uses http.DefaultCLient when httpClient is nil.
@@ -71,20 +71,20 @@ func NewClient(bridge models.Bridge, apiKey string, httpClient *http.Client, log
 		HTTPClient: httpClient,
 	}
 
-	c.Lights = &LightService{client: c}
-	c.Rooms = &RoomService{client: c}
-	c.Zones = &ZoneService{client: c}
-	c.Scenes = &SceneService{client: c}
-	c.Register = &RegisterService{client: c}
-	c.DevicePower = &DevicePowerService{client: c}
-	c.DeviceSoftwareUpdate = &DeviceSoftwareUpdateService{client: c}
-	c.EntertainmentConfiguration = &EntertainmentConfigurationService{client: c}
-	c.Entertainment = &EntertainmentService{client: c}
-	c.BridgeHome = &BridgeHomeService{client: c}
-	c.Device = &DeviceService{client: c}
-	c.GroupedLight = &GroupedLightService{client: c}
-	c.Button = &ButtonService{client: c}
-	c.EventStream = NewEventService(c)
+	c.Lights = &lightService{client: c}
+	c.Rooms = &roomService{client: c}
+	c.Zones = &zoneService{client: c}
+	c.Scenes = &sceneService{client: c}
+	c.Register = &registerService{client: c}
+	c.DevicePower = &devicePowerService{client: c}
+	c.DeviceSoftwareUpdate = &deviceSoftwareUpdateService{client: c}
+	c.EntertainmentConfiguration = &entertainmentConfigurationService{client: c}
+	c.Entertainment = &entertainmentService{client: c}
+	c.BridgeHome = &bridgeHomeService{client: c}
+	c.Device = &deviceService{client: c}
+	c.GroupedLight = &groupedLightService{client: c}
+	c.Button = &buttonService{client: c}
+	c.EventStream = newEventService(c)
 
 	return c
 }

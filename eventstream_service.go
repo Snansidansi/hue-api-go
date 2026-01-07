@@ -12,7 +12,7 @@ import (
 	"github.com/Snansidansi/hue-api-go/models"
 )
 
-type EventService struct {
+type eventService struct {
 	client *Client
 
 	ctx    context.Context
@@ -23,47 +23,47 @@ type EventService struct {
 	errorChan  chan error
 }
 
-func NewEventService(client *Client) *EventService {
+func newEventService(client *Client) *eventService {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	return &EventService{
+	return &eventService{
 		client: client,
 		ctx:    ctx,
 		cancel: cancel,
 	}
 }
 
-func (es *EventService) GetRawStream(chanBufSize uint) <-chan []byte {
+func (es *eventService) GetRawStream(chanBufSize uint) <-chan []byte {
 	if es.rawChan == nil {
 		es.rawChan = make(chan []byte, chanBufSize)
 	}
 	return es.rawChan
 }
 
-// possible events are LightChangeEvent, GroupChangeEvent, ButtonEvent, SceneEvent
-func (es *EventService) GetEventStream(chanBufSize uint) <-chan any {
+// possible events are LightChangeEvent, GroupChangeEvent, ButtonEvent, SceneEvent, EntertainmentConfigurationEvent
+func (es *eventService) GetEventStream(chanBufSize uint) <-chan any {
 	if es.eventsChan == nil {
 		es.eventsChan = make(chan any, chanBufSize)
 	}
 	return es.eventsChan
 }
 
-func (es *EventService) GetErrorStream(chanBufSize uint) <-chan error {
+func (es *eventService) GetErrorStream(chanBufSize uint) <-chan error {
 	if es.errorChan == nil {
 		es.errorChan = make(chan error, chanBufSize)
 	}
 	return es.errorChan
 }
 
-func (es *EventService) Start() {
+func (es *eventService) Start() {
 	go es.listenLoop()
 }
 
-func (es *EventService) Stop() {
+func (es *eventService) Stop() {
 	es.cancel()
 }
 
-func (es *EventService) listenLoop() {
+func (es *eventService) listenLoop() {
 	url := fmt.Sprintf("https://%s/eventstream/clip/v2", es.client.Bridge.IPAdress)
 
 	for {
@@ -108,7 +108,7 @@ func (es *EventService) listenLoop() {
 	}
 }
 
-func (es *EventService) dispatch(data []byte) {
+func (es *eventService) dispatch(data []byte) {
 	if es.rawChan != nil {
 		select {
 		case es.rawChan <- data:
@@ -157,7 +157,7 @@ type streamData struct {
 	Speed    *float64                    `json:"speed,omitempty"`
 }
 
-func (es *EventService) processStructured(data []byte) {
+func (es *eventService) processStructured(data []byte) {
 	var msgs []streamMessage
 	if err := json.Unmarshal(data, &msgs); err != nil {
 		if es.errorChan != nil {
@@ -192,7 +192,7 @@ func (es *EventService) processStructured(data []byte) {
 	}
 }
 
-func (es *EventService) determineStateChange(eventType string, item streamData) bool {
+func (es *eventService) determineStateChange(eventType string, item streamData) bool {
 	hasState := false
 	hasConfig := false
 
@@ -259,7 +259,7 @@ func (es *EventService) determineStateChange(eventType string, item streamData) 
 	return false
 }
 
-func (es *EventService) createEventModel(base models.BaseEventFields, item streamData) any {
+func (es *eventService) createEventModel(base models.BaseEventFields, item streamData) any {
 	switch item.Type {
 	case "light":
 		return models.LightChangeEvent{
