@@ -2,7 +2,17 @@
 
 This is a Go client for the Phillips Hue API v2. It provides a convenient way to interact with your Hue Bridge and control your lights and other devices.
 
-For a complete overview of all features, please have a look at the `examples` directory.
+## Examples
+
+For a complete overview of all features, please have a look at the `examples` directory. An  [example application](https://github.com/Snansidansi/hue-api-go/tree/b5599dc6aa873f1f30e6998b9a02de18bd54262d/examples/live-display) can also be found there (`live-display`).
+
+---
+
+To use all the examples you have to create a .env file with the following env vars in the root projekt dir:
+- HUE_BRIDGE_IP
+- HUE_BRIDGE_USERNAME (the api key)
+
+To get those values you can uncomment the `TestBridge()` function in the [main.go](https://github.com/Snansidansi/hue-api-go/blob/b5599dc6aa873f1f30e6998b9a02de18bd54262d/examples/main.go) and uncomment the `discoverBridges()` and the `registerInBridge(...)` function in the [bridge_examples.go](https://github.com/Snansidansi/hue-api-go/blob/b5599dc6aa873f1f30e6998b9a02de18bd54262d/examples/bridge_examples.go) file.
 
 ## Getting Started
 
