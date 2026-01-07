@@ -45,7 +45,7 @@ The Live API connects to the Hue Bridge's event stream (SSE) to receive real-tim
 
 ### Available Events
 
-The event models are defined in `models/eventstream.go`. The service logic resides in `eventstream_service.go`.
+The event models are defined in `models/eventstream.go`. The service logic resides in `eventstream_service.go`. In the same file are also the consts for `EventeTypes` and the `GroupTypes` defined.
 
 | Event Type                        | Description                                                                 |
 | :-------------------------------- | :-------------------------------------------------------------------------- |
