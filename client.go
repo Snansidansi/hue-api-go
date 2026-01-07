@@ -44,10 +44,12 @@ type Client struct {
 	BridgeHome                 *BridgeHomeService
 	Device                     *DeviceService
 	GroupedLight               *GroupedLightService
+	EventStream                *EventService
 	Button                     *ButtonService
 }
 
 // Uses http.DefaultCLient when httpClient is nil.
+// The client will set a hue api auth header in each request.
 func NewClient(bridge models.Bridge, apiKey string, httpClient *http.Client, logging bool) *Client {
 	if httpClient == nil {
 		httpClient = &http.Client{}
@@ -82,6 +84,7 @@ func NewClient(bridge models.Bridge, apiKey string, httpClient *http.Client, log
 	c.Device = &DeviceService{client: c}
 	c.GroupedLight = &GroupedLightService{client: c}
 	c.Button = &ButtonService{client: c}
+	c.EventStream = NewEventService(c)
 
 	return c
 }

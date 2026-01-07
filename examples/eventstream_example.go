@@ -19,12 +19,11 @@ func TestRawEvents(client *hueapi.Client) {
 	fmt.Println("--> Start Raw Event Listener")
 	fmt.Println("Press [ENTER] to stop the listener...")
 
-	es := hueapi.NewEventService(client)
-	rawStream := es.GetRawStream(100)
-	errorStream := es.GetErrorStream(10)
+	rawStream := client.EventStream.GetRawStream(100)
+	errorStream := client.EventStream.GetErrorStream(10)
 
-	es.Start()
-	defer es.Stop()
+	client.EventStream.Start()
+	defer client.EventStream.Stop()
 
 	stopSignal := make(chan struct{})
 	go func() {
@@ -67,13 +66,11 @@ func TestStructuredEvents(client *hueapi.Client) {
 	fmt.Println("--> Start Structured Event Listener")
 	fmt.Println("Press [ENTER] to stop the listener...")
 
-	es := hueapi.NewEventService(client)
+	events := client.EventStream.GetEventStream(100)
+	errors := client.EventStream.GetErrorStream(10)
 
-	events := es.GetEventStream(100)
-	errors := es.GetErrorStream(10)
-
-	es.Start()
-	defer es.Stop()
+	client.EventStream.Start()
+	defer client.EventStream.Stop()
 
 	stopSignal := make(chan struct{})
 	go func() {

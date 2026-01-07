@@ -21,6 +21,7 @@ type BaseEventFields struct {
 	StateChanges bool      // true ONLY if it is an 'update' AND state data is present AND NO config data is present
 }
 
+// If adding new events also add them in the func docs fo the GetEventStream method of the EventService
 type LightChangeEvent struct {
 	BaseEventFields
 	On               *On
