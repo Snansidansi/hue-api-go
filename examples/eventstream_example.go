@@ -55,10 +55,10 @@ func printBaseInfo(name string, base models.BaseEventFields) {
 	timeStr := base.Timestamp.Format("15:04:05")
 
 	if base.StateChanges {
-		fmt.Printf("[%s] %s %s: ID=%s [STATE CHANGE]\n", timeStr, base.EventType, name, base.ID)
+		fmt.Printf("[%s] %s %s: ID=%s EventID=%s [STATE CHANGE]\n", timeStr, base.EventType, name, base.ID, base.EventID)
 	} else {
 		// Either Add/Delete OR Config Change -> Reload suggested
-		fmt.Printf("[%s] %s %s: ID=%s [RELOAD RESOURCE]\n", timeStr, base.EventType, name, base.ID)
+		fmt.Printf("[%s] %s %s: ID=%s EventID=%s [RELOAD RESOURCE]\n", timeStr, base.EventType, name, base.ID, base.EventID)
 	}
 }
 
@@ -87,7 +87,7 @@ func TestStructuredEvents(client *hueapi.Client) {
 		case rawEvent := <-events:
 			switch e := rawEvent.(type) {
 
-			case models.LightChangeEvent:
+			case *models.LightChangeEvent:
 				printBaseInfo("LIGHT", e.BaseEventFields)
 				if e.StateChanges {
 					if e.On != nil {
@@ -105,7 +105,7 @@ func TestStructuredEvents(client *hueapi.Client) {
 					}
 				}
 
-			case models.GroupChangeEvent:
+			case *models.GroupChangeEvent:
 				printBaseInfo("GROUP ("+e.Type+")", e.BaseEventFields)
 				if e.StateChanges {
 					if e.On != nil {
@@ -116,13 +116,13 @@ func TestStructuredEvents(client *hueapi.Client) {
 					}
 				}
 
-			case models.ButtonEvent:
+			case *models.ButtonEvent:
 				printBaseInfo("BUTTON", e.BaseEventFields)
 				if e.Button != "" {
 					fmt.Printf("   -> Action: %s\n", e.Button)
 				}
 
-			case models.SceneEvent:
+			case *models.SceneEvent:
 				printBaseInfo("SCENE", e.BaseEventFields)
 				if e.StateChanges && e.Status != nil {
 					if e.Status.Active != "" {
@@ -133,7 +133,7 @@ func TestStructuredEvents(client *hueapi.Client) {
 					}
 				}
 
-			case models.EntertainmentConfigurationEvent:
+			case *models.EntertainmentConfigurationEvent:
 				printBaseInfo("ENTERTAINMENT", e.BaseEventFields)
 				if e.StateChanges {
 					if e.Status != "" {

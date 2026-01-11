@@ -125,10 +125,11 @@ type streamMessage struct {
 	Type         string       `json:"type"` // "update", "add", "delete"
 	CreationTime time.Time    `json:"creationtime"`
 	Data         []streamData `json:"data"`
+	EventID      string       `json:"id"`
 }
 
 type streamData struct {
-	ID   string `json:"id"`
+	ID   string `json:"id"` // not the id of the event -> id of entry in the data[] of the event
 	Type string `json:"type"`
 
 	On               *models.On               `json:"on,omitempty"`
@@ -176,6 +177,7 @@ func (es *eventService) processStructured(data []byte) {
 			base := models.BaseEventFields{
 				EventType:    eventType,
 				ID:           item.ID,
+				EventID:      msg.EventID,
 				Timestamp:    timestamp,
 				StateChanges: stateChanges,
 			}

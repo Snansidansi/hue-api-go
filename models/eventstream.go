@@ -16,7 +16,8 @@ const (
 
 type BaseEventFields struct {
 	EventType    string // add, update, delete
-	ID           string
+	EventID      string
+	ID           string    // ID of the ressource the event is about
 	Timestamp    time.Time // from creationtime
 	StateChanges bool      // true ONLY if it is an 'update' AND state data is present AND NO config data is present
 }
