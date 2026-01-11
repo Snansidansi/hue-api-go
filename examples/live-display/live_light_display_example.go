@@ -137,7 +137,7 @@ func GetLamps(client *hueapi.Client) []*Lamp {
 }
 
 func handleEvent(c *Controller, event any) {
-	if lightEvent, ok := event.(models.LightChangeEvent); ok {
+	if lightEvent, ok := event.(*models.LightChangeEvent); ok {
 		targetID := lightEvent.ID
 
 		c.Update(targetID, func(l *Lamp) {

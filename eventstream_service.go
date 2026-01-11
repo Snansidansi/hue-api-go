@@ -40,7 +40,7 @@ func (es *eventService) GetRawStream(chanBufSize uint) <-chan []byte {
 	return es.rawChan
 }
 
-// Possible events are LightChangeEvent, GroupChangeEvent, ButtonEvent, SceneEvent, EntertainmentConfigurationEvent
+// Possible events are *LightChangeEvent, *GroupChangeEvent, *ButtonEvent, *SceneEvent, *EntertainmentConfigurationEvent
 func (es *eventService) GetEventStream(chanBufSize uint) <-chan any {
 	if es.eventsChan == nil {
 		es.eventsChan = make(chan any, chanBufSize)
@@ -171,7 +171,7 @@ func (es *eventService) processStructured(data []byte) {
 		timestamp := msg.CreationTime
 
 		for _, item := range msg.Data {
-			stateChanges := es.determineStateChange(eventType, item)
+			stateChanges := es.determineStateChange(eventType, &item)
 
 			base := models.BaseEventFields{
 				EventType:    eventType,
@@ -180,7 +180,7 @@ func (es *eventService) processStructured(data []byte) {
 				StateChanges: stateChanges,
 			}
 
-			event := es.createEventModel(base, item)
+			event := es.createEventModel(&base, &item)
 
 			if event != nil {
 				select {
@@ -192,7 +192,7 @@ func (es *eventService) processStructured(data []byte) {
 	}
 }
 
-func (es *eventService) determineStateChange(eventType string, item streamData) bool {
+func (es *eventService) determineStateChange(eventType string, item *streamData) bool {
 	hasState := false
 	hasConfig := false
 
@@ -259,11 +259,11 @@ func (es *eventService) determineStateChange(eventType string, item streamData) 
 	return false
 }
 
-func (es *eventService) createEventModel(base models.BaseEventFields, item streamData) any {
+func (es *eventService) createEventModel(base *models.BaseEventFields, item *streamData) any {
 	switch item.Type {
 	case "light":
-		return models.LightChangeEvent{
-			BaseEventFields:  base,
+		return &models.LightChangeEvent{
+			BaseEventFields:  *base,
 			On:               item.On,
 			Dimming:          item.Dimming,
 			Color:            item.Color,
@@ -272,8 +272,8 @@ func (es *eventService) createEventModel(base models.BaseEventFields, item strea
 		}
 
 	case "grouped_light", "zone", "room":
-		return models.GroupChangeEvent{
-			BaseEventFields: base,
+		return &models.GroupChangeEvent{
+			BaseEventFields: *base,
 			Type:            item.Type,
 			On:              item.On,
 			Dimming:         item.Dimming,
@@ -284,8 +284,8 @@ func (es *eventService) createEventModel(base models.BaseEventFields, item strea
 		if item.Button != nil {
 			btnAction = item.Button.LastEvent
 		}
-		return models.ButtonEvent{
-			BaseEventFields: base,
+		return &models.ButtonEvent{
+			BaseEventFields: *base,
 			Button:          btnAction,
 		}
 
@@ -297,8 +297,8 @@ func (es *eventService) createEventModel(base models.BaseEventFields, item strea
 				es.errorChan <- err
 			}
 		}
-		return models.SceneEvent{
-			BaseEventFields: base,
+		return &models.SceneEvent{
+			BaseEventFields: *base,
 			Status:          sceneStatus,
 		}
 
@@ -310,8 +310,8 @@ func (es *eventService) createEventModel(base models.BaseEventFields, item strea
 				es.errorChan <- err
 			}
 		}
-		return models.EntertainmentConfigurationEvent{
-			BaseEventFields: base,
+		return &models.EntertainmentConfigurationEvent{
+			BaseEventFields: *base,
 			Status:          statusString,
 			ActiveStreamer:  item.ActiveStreamer,
 		}
