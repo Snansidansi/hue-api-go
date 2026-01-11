@@ -16,7 +16,7 @@ func (s *sceneService) GetScenes() (*models.HueResponse[models.Scene], error) {
 	return doGetRequest[models.Scene](s.client, urlSuffix)
 }
 
-func (s *sceneService) GetScene(id string) (*models.HueResponse[models.Scene], error) {
+func (s *sceneService) GetSceneByID(id string) (*models.HueResponse[models.Scene], error) {
 	urlSuffix := fmt.Sprintf("resource/scene/%s", id)
 	return doGetRequest[models.Scene](s.client, urlSuffix)
 }

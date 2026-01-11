@@ -15,7 +15,7 @@ func (s *bridgeHomeService) GetBridgeHomes() (*models.HueResponse[models.BridgeH
 	return doGetRequest[models.BridgeHome](s.client, urlSuffix)
 }
 
-func (s *bridgeHomeService) GetBridgeHome(id string) (*models.HueResponse[models.BridgeHome], error) {
+func (s *bridgeHomeService) GetBridgeHomeByID(id string) (*models.HueResponse[models.BridgeHome], error) {
 	urlSuffix := fmt.Sprintf("resource/bridge_home/%s", id)
 	return doGetRequest[models.BridgeHome](s.client, urlSuffix)
 }

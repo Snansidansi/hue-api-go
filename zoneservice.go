@@ -16,7 +16,7 @@ func (s *zoneService) GetZones() (*models.HueResponse[models.Zone], error) {
 	return doGetRequest[models.Zone](s.client, urlSuffix)
 }
 
-func (s *zoneService) GetZone(id string) (*models.HueResponse[models.Zone], error) {
+func (s *zoneService) GetZoneByID(id string) (*models.HueResponse[models.Zone], error) {
 	urlSuffix := fmt.Sprintf("resource/zone/%s", id)
 	return doGetRequest[models.Zone](s.client, urlSuffix)
 }
