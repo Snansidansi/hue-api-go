@@ -40,7 +40,7 @@ func (es *eventService) GetRawStream(chanBufSize uint) <-chan []byte {
 	return es.rawChan
 }
 
-// possible events are LightChangeEvent, GroupChangeEvent, ButtonEvent, SceneEvent, EntertainmentConfigurationEvent
+// Possible events are LightChangeEvent, GroupChangeEvent, ButtonEvent, SceneEvent, EntertainmentConfigurationEvent
 func (es *eventService) GetEventStream(chanBufSize uint) <-chan any {
 	if es.eventsChan == nil {
 		es.eventsChan = make(chan any, chanBufSize)
